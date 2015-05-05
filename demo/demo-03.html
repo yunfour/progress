@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>如何使用API</title>
+
+<script src="../lib/seajs/2.3.0/sea.js"></script>
+<script type="text/javascript">
+(function(seajs) {
+    
+    seajs.config({
+        
+        base: './../',
+        
+        paths: {
+            
+            createClass: 'lib/createClass',
+            pubSub: 'lib/pubSub',
+            jquery: 'lib/jquery'
+        }
+    });
+})(seajs);
+</script>
+
+<style type="text/css">
+.progress{ height: 20px; width: 300px; background: #999;}
+.progress-bd{ height: 20px; width: 0; background: #00D6B2; overflow: hidden;}
+</style>
+</head>
+
+<body>
+
+<div id="J-progress-1" class="progress">
+    <div class="progress-bd"></div>
+</div>
+
+<p>&nbsp;</p>
+
+<input id="J-start-btn" type="button" value="开始" />
+<input id="J-pause-btn" type="button" value="暂停" />
+<input id="J-restart-btn" type="button" value="重新开始" />
+<input id="J-stop-btn" type="button" value="停止" />
+<input id="J-finish-btn" type="button" value="完成" />
+
+
+<script type="text/javascript">
+seajs.use(['createClass/0.0.1/createClass.js', 'jquery/1.7.2/jquery.js', '../dist/progress.js'], function(createClass, $, Progress) {
+    
+    /**
+     * @function
+     * @description 对数值number保留小数位，bitNum为需要保留的小数位的长度
+     * @param {Number} number 需要保留小数位的目标数值
+     * @param {Object} bitNum 需要保留的小数位的长度
+     */
+    function decimal(number, bitNum) {
+        
+        var intPart, floatPart;
+        
+        number = number || 0;
+        number = number.toString();
+        
+        number = number.split('.');
+        
+        bitNum = bitNum || 2;
+        
+        intPart = number[0] || '0';
+        floatPart = (number[1] || '0') + '00000000000000000000';
+        
+        floatPart = floatPart.substring(0, bitNum);
+        
+        return intPart + '.' + floatPart;
+    }
+    
+    var progress = new Progress();
+    
+    var startBtn   = $('#J-start-btn'),
+        pauseBtn   = $('#J-pause-btn'),
+        restartBtn = $('#J-restart-btn'),
+        stopBtn    = $('#J-stop-btn'),
+        finishBtn  = $('#J-finish-btn');
+    
+    var progressEle = $('#J-progress-1').children();
+    
+    // 监听progress事件，实时修改进度条的进度
+    progress.on('progress', function(percent) {
+        
+        progressEle.css('width', decimal(percent, 2) + '%');
+    });
+    
+    // 监听到“停止”事件发生时，将进度条的进度设为0
+    progress.on('stop', function() {
+        
+        progressEle.css('width', '0');
+    });
+    
+    
+    startBtn.click(function() {
+        
+        // 开始模拟进度
+        progress.start();
+    });
+    
+    pauseBtn.click(function() {
+        
+        // 暂停进度前进
+        progress.pause();
+    });
+    
+    restartBtn.click(function() {
+        
+        // 重新从0开始模拟进度
+        progress.restart();
+    });
+    
+    stopBtn.click(function() {
+        
+        // 停止模拟进度，此时进度为会复原到0
+        progress.stop();
+    });
+    
+    finishBtn.click(function() {
+        
+        // 完成进度，此时进度会迅速前进到100
+        progress.finish();
+    });
+});
+</script>
+</body>
+</html>

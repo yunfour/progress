@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>模拟图片加载进度</title>
+
+<script src="../lib/seajs/2.3.0/sea.js"></script>
+<script type="text/javascript">
+(function(seajs) {
+    
+    seajs.config({
+        
+        base: './../',
+        
+        paths: {
+            
+            createClass: 'lib/createClass',
+            pubSub: 'lib/pubSub',
+            jquery: 'lib/jquery'
+        }
+    });
+})(seajs);
+</script>
+
+<style type="text/css">
+.progress{ height: 6px; width: 300px; background: #999; margin: -3px 0 0 -150px; position: absolute; left: 50%; top: 50%;}
+.progress-bd{ height: 6px; width: 0; background: #00D6B2; overflow: hidden;}
+
+.img-panel{ height: 500px; width: 500px; border: 1px solid #888; position: relative; overflow: hidden;}
+.img-panel img{ width: 100%;}
+</style>
+</head>
+
+<body>
+
+<div id="J-img-panel" class="img-panel">
+    <div id="J-progress-1" class="progress">
+        <div class="progress-bd"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+seajs.use(['createClass/0.0.1/createClass.js', 'jquery/1.7.2/jquery.js', '../dist/progress.js'], function(createClass, $, Progress) {
+    
+    /**
+     * @function
+     * @description 对数值number保留小数位，bitNum为需要保留的小数位的长度
+     * @param {Number} number 需要保留小数位的目标数值
+     * @param {Object} bitNum 需要保留的小数位的长度
+     */
+    function decimal(number, bitNum) {
+        
+        var intPart, floatPart;
+        
+        number = number || 0;
+        number = number.toString();
+        
+        number = number.split('.');
+        
+        bitNum = bitNum || 2;
+        
+        intPart = number[0] || '0';
+        floatPart = (number[1] || '0') + '00000000000000000000';
+        
+        floatPart = floatPart.substring(0, bitNum);
+        
+        return intPart + '.' + floatPart;
+    }
+    
+    
+    var progress = new Progress();
+    var progressEle = $('#J-progress-1').children(),
+        imgPanel    = $('#J-img-panel');
+    
+    var newImg = $(new Image());
+    
+    // 监听progress事件，实时修改进度条的进度
+    progress.on('progress', function(percent) {
+        
+        progressEle.css('width', decimal(percent, 2) + '%');
+    });
+    
+    newImg.appendTo(imgPanel)
+          .attr('src', 'http://ww4.sinaimg.cn/bmiddle/9499f9e8gw1ers7r81k22g20720nmhdw.gif?r=' + Math.random())
+          .css('visibility', 'hidden');
+    
+    // 开始发送请求，调用start()方法启动进度模拟器
+    progress.start();
+    
+    newImg.on('load', function() {
+        
+        progress.finish();
+    });
+    
+    progress.on('finish', function() {
+        
+        progressEle.parent().hide();
+        newImg.css('visibility', 'visible');
+    });
+});
+</script>
+</body>
+</html>

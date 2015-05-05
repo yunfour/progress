@@ -1,0 +1,19 @@
+{
+  "name": "progress",
+  "version": "0.0.1",
+  "description": "组件：模拟进度控制的组件",
+  "main": "progress.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": ""
+  },
+  "author": "yunfour@qq.com",
+  "license": "MIT",
+  "devDependencies": {
+    "gulp": "^3.8.11",
+    "gulp-rename": "^1.2.2",
+    "gulp-uglify": "^1.1.0"
+  }
+}
